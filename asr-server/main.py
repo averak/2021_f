@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import os
+import glob
+import shutil
 import argparse
 
 from core import config
@@ -62,8 +65,21 @@ def start_mode():
 
 
 def clear_mode():
-    # FIXME
-    return
+    data_dirs: list = [
+        config.SPEECH_ROOT_PATH,
+        config.NOISE_ROOT_PATH,
+    ]
+
+    for dir_name in data_dirs:
+        files: list = glob.glob(dir_name + '/*')
+
+        for file_name in files:
+            if os.path.isfile(file_name):
+                os.remove(file_name)
+            else:
+                shutil.rmtree(file_name)
+
+            print(message.DELETE_FILE_MSG(file_name))
 
 
 if __name__ == '__main__':
