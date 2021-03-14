@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 import argparse
 
+from core import config
+from core import message
+from core import record
+from core import util
+
 
 def train_mode():
     # FIXME
@@ -8,8 +13,42 @@ def train_mode():
 
 
 def record_mode():
-    # FIXME
-    return
+    default_source: str = '1'
+    input_str: str = input(message.SOURCE_INPUT_GUIDE(default_source)) \
+        or default_source
+
+    # set save path
+    save_root_path: str = ''
+    if input_str == 'noise':
+        save_root_path = config.NOISE_ROOT_PATH
+    else:
+        save_root_path = config.SPEECH_ROOT_PATH + '/' + input_str
+
+    # mkdir & count number of exists files
+    util.mkdir(save_root_path)
+    save_index: int = util.get_number_of_files(save_root_path, 'wav')
+
+    recorder: record.Record = record.Record()
+    start_recording: bool = True
+
+    print(message.RECORDING_HELP_MSG)
+    while input() != 'q':
+        if start_recording:
+            recorder.start()
+            print(message.RECORDING_VOICE_MSG(save_index), end='')
+        else:
+            recorder.stop()
+
+            # <save_root_path>/<save_index>.wav
+            file_name: str = '%s/%d.wav' % (save_root_path, save_index)
+            recorder.save(file_name)
+            print(message.CREATED_FILE_MSG(file_name))
+            save_index += 1
+
+        start_recording = not start_recording
+
+    print(message.CREATED_DATA_MSG(save_index))
+    recorder.exit()
 
 
 def build_mode():

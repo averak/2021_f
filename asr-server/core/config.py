@@ -11,7 +11,8 @@ MODEL_PATH: str = MODEL_ROOT_PATH + '/final.h5'
 
 # wave config
 WAVE_RATE: int = 16000
-WAVE_BIT: int = 16
+WAVE_CHANNELS: int = 1
+WAVE_CHUNK: int = 2048
 
 # training params
 EPOCHS: int = 50
@@ -22,4 +23,5 @@ LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']
 
 # classes
-CLASSES = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
+CLASSES: list = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
+N_CLASSES: int = len(CLASSES)
