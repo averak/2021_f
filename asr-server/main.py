@@ -83,7 +83,8 @@ def build_mode():
 
         # shift noise data
         for i in range(mfcc.shape[1] // config.MFCC_FRAMES):
-            shift_mfcc = mfcc[:, i * config.MFCC_FRAMES:(i + 1) * config.MFCC_FRAMES]
+            shift_mfcc = \
+                mfcc[:, i * config.MFCC_FRAMES:(i + 1) * config.MFCC_FRAMES]
             noise_mfccs.append(shift_mfcc)
 
     # speech data
