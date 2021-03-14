@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+scipy = "*"
+tensorflow = "*"
+wave = "*"
+rwave = "*"
+tqdm = "*"
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+pyaudio = "*"
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+format = "autopep8 -ivr ."
+lint = "flake8 --show-source --ignore=E501 ."
+test = "python -m unittest discover test"
+record = "python main.py --record"
+build = "python main.py --build"
+train = "python main.py --train"
+start = "python main.py --start"
