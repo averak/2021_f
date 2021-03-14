@@ -8,6 +8,7 @@ SPEECH_ROOT_PATH: str = RECORD_ROOT_PATH + '/speech'
 NOISE_ROOT_PATH: str = RECORD_ROOT_PATH + '/noise'
 MODEL_ROOT_PATH: str = './ckpt'
 MODEL_PATH: str = MODEL_ROOT_PATH + '/final.h5'
+RECORD_WAV_PATH: str = DATA_ROOT_PATH + '/record.wav'
 
 # wave config
 WAVE_RATE: int = 16000

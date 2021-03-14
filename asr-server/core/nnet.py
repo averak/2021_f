@@ -7,20 +7,20 @@ from core import config
 
 
 class NNet:
-    def __init__(self):
-        self.nnet: Sequential = self.make_nnet()
+    def __init__(self, load_weights: bool = True):
+        self.nnet: Sequential = self.make_nnet(load_weights)
 
-    def make_nnet(self) -> Sequential:
+    def make_nnet(self, load_weights: bool) -> Sequential:
         result: Sequential = Sequential()
         result.add(layers.Input(shape=config.INPUT_SHAPE))
-        result.add(layers.Conv2D(16, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
-        result.add(layers.Dropout(0.5))
         result.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        result.add(layers.MaxPool2D((2, 2)))
+        result.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        result.add(layers.Dropout(0.3))
 
         result.add(layers.Flatten())
         result.add(layers.Dense(64, activation='relu'))
-        result.add(layers.Dropout(0.5))
+        result.add(layers.Dropout(0.3))
         result.add(layers.Dense(config.N_CLASSES, activation='softmax'))
 
         # result.summary()
@@ -33,7 +33,7 @@ class NNet:
         )
 
         # load trained weights
-        if os.path.exists(config.MODEL_PATH):
+        if load_weights and os.path.exists(config.MODEL_PATH):
             result.load_weights(config.MODEL_PATH)
 
         return result
@@ -57,4 +57,8 @@ class NNet:
 
     def predict(self, vector: np.ndarray) -> int:
         result: int = np.argmax(self.nnet.predict(np.array([vector]))[0])
+        return result
+
+    def evaluate(self, x: np.ndarray, y: np.ndarray) -> float:
+        result: float = self.nnet.evaluate(x, y)[1]
         return result

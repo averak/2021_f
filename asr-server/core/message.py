@@ -47,6 +47,16 @@ def PROCESSING_SOURCE_MSG(source_str: str) -> str:
     return result
 
 
+def ACCURACY_MSG(accuracy: float) -> str:
+    result: str = 'Accuracy: %3.1f%%' % (accuracy * 100)
+    return result
+
+
+def PREDICT_CLASS_MSG(class_name: str) -> str:
+    result: str = 'Predict: %s' % class_name
+    return result
+
+
 def SOURCE_INPUT_GUIDE(default_source_str: str) -> str:
     result: str = 'which source type? ' + \
         FontColors.GREEN + \
