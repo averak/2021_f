@@ -13,14 +13,14 @@ class NNet:
     def make_nnet(self) -> Sequential:
         result: Sequential = Sequential()
         result.add(layers.Input(shape=config.INPUT_SHAPE))
+        result.add(layers.Conv2D(16, (3, 3), activation='relu'))
+        result.add(layers.MaxPool2D((2, 2)))
+        result.add(layers.Dropout(0.5))
         result.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
-        result.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
-        result.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
         result.add(layers.Flatten())
         result.add(layers.Dense(64, activation='relu'))
+        result.add(layers.Dropout(0.5))
         result.add(layers.Dense(config.N_CLASSES, activation='softmax'))
 
         # result.summary()
@@ -56,5 +56,5 @@ class NNet:
         self.nnet.save_weights(config.MODEL_PATH)
 
     def predict(self, vector: np.ndarray) -> int:
-        result: int = np.argmax(self.nnet.predict(vector))[0]
+        result: int = np.argmax(self.nnet.predict(np.array([vector]))[0])
         return result

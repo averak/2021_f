@@ -1,18 +1,30 @@
 #!/usr/bin/env python
 import os
+import sys
 import glob
+import tqdm
 import shutil
 import argparse
+import rwave
+import random
+import numpy as np
 
 from core import config
 from core import message
+from core import nnet
+from core import preprocessing
 from core import record
 from core import util
 
 
 def train_mode():
-    # FIXME
-    return
+    x: np.ndarray = np.load(config.TEACHER_X_PATH)
+    y: np.ndarray = np.load(config.TEACHER_Y_PATH)
+
+    x = np.reshape(x, (*x.shape, 1))
+
+    nnet_: nnet.NNet = nnet.NNet()
+    nnet_.train(x, y)
 
 
 def record_mode():
@@ -22,10 +34,13 @@ def record_mode():
 
     # set save path
     save_root_path: str = ''
-    if input_str == 'noise':
+    if input_str in config.CLASSES:
+        save_root_path = config.SPEECH_ROOT_PATH + '/' + input_str
+    elif input_str == 'noise':
         save_root_path = config.NOISE_ROOT_PATH
     else:
-        save_root_path = config.SPEECH_ROOT_PATH + '/' + input_str
+        print(message.ERROR_INVALID_SOURCE_NAME)
+        sys.exit(1)
 
     # mkdir & count number of exists files
     util.mkdir(save_root_path)
@@ -55,8 +70,39 @@ def record_mode():
 
 
 def build_mode():
-    # FIXME
-    return
+    # teacher data(x: mfcc, y: label)
+    x: list = []
+    y: list = []
+
+    # noise data
+    print(message.PROCESSING_SOURCE_MSG('noise'))
+    noise_files: list = glob.glob(config.NOISE_ROOT_PATH + '/*.wav')
+    noise_mfccs: list = []
+    for file in tqdm.tqdm(noise_files):
+        mfcc = rwave.to_mfcc(file, config.WAVE_RATE, config.MFCC_DIM)
+        mfcc = preprocessing.resample(
+            mfcc[:config.MFCC_FRAMES], config.MFCC_FRAMES)
+        noise_mfccs.append(mfcc)
+
+    # speech data
+    print(message.PROCESSING_SOURCE_MSG('speech'))
+    for class_name in tqdm.tqdm(config.CLASSES):
+        files: list = glob.glob('%s/%s/*.wav' %
+                                (config.SPEECH_ROOT_PATH, class_name))
+        for file in files:
+            speech_mfcc = rwave.to_mfcc(
+                file, config.WAVE_RATE, config.MFCC_DIM)
+            speech_mfcc = preprocessing.resample(
+                speech_mfcc, config.MFCC_FRAMES)
+            noise_mfcc = random.choice(noise_mfccs)
+
+            # FIXME: 実装できてません
+            x.append(speech_mfcc + noise_mfcc)
+            y.append(config.CLASSES.index(class_name))
+
+    # save teacher data
+    np.save(config.TEACHER_X_PATH, np.array(x))
+    np.save(config.TEACHER_Y_PATH, np.array(y))
 
 
 def start_mode():
@@ -68,6 +114,7 @@ def clear_mode():
     data_dirs: list = [
         config.SPEECH_ROOT_PATH,
         config.NOISE_ROOT_PATH,
+        config.MODEL_ROOT_PATH,
     ]
 
     for dir_name in data_dirs:

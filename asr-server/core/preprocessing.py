@@ -73,3 +73,8 @@ def filter(data: np.ndarray) -> np.ndarray:
             bpf[i] = 1
 
     return data * bpf
+
+def resample(mfcc: np.ndarray, n_frames: int) -> np.ndarray:
+    result: np.ndarray = signal.resample(mfcc.T, n_frames)
+    result = result.T
+    return result

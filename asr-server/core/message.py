@@ -5,6 +5,10 @@ class FontColors:
     RESET: str = '\033[0m'
 
 
+ERROR_INVALID_SOURCE_NAME: str = FontColors.RED + \
+    'Cannot record such source name. Try again.' + FontColors.RESET
+
+
 RECORDING_HELP_MSG: str = 'Press enter to start recording.' + \
     '\n' + \
     'Enter the <q> key to quit.'

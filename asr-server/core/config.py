@@ -13,6 +13,10 @@ MODEL_PATH: str = MODEL_ROOT_PATH + '/final.h5'
 WAVE_RATE: int = 16000
 WAVE_CHANNELS: int = 1
 WAVE_CHUNK: int = 2048
+MFCC_DIM: int = 12
+MFCC_FRAMES: int = 64
+MFCC_SHIFT_INTERVAL: int = 2
+INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_FRAMES, 1)
 
 # training params
 EPOCHS: int = 50
@@ -23,5 +27,5 @@ LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']
 
 # classes
-CLASSES: list = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
+CLASSES: tuple = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
 N_CLASSES: int = len(CLASSES)

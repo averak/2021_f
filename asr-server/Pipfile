@@ -8,6 +8,7 @@ numpy = "*"
 scipy = "*"
 tensorflow = "*"
 wave = "*"
+rwave = "*"
 tqdm = "*"
 
 [dev-packages]
