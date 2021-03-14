@@ -46,3 +46,19 @@ $ pipenv run start
 ```sh
 $ pipenv run help
 ```
+
+### データディレクトリについて
+
+```sh
+data
+├── record
+│  ├── noise
+│  │  ├── xxx.wav
+│  │  └── xxx.wav
+│  └── speech
+│     ├── xxx.wav
+│     └── xxx.wav
+└── teacher
+   ├── x.npy
+   └── y.npy
+```
