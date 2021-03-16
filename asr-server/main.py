@@ -9,6 +9,7 @@ import rwave
 import numpy as np
 
 from core import config
+from core import demo
 from core import message
 from core import nnet
 from core import preprocessing
@@ -114,6 +115,10 @@ def start_mode():
 
 
 def demo_mode():
+    demo_: demo.Demo = demo.Demo()
+    demo_.exec()
+    sys.exit(0)
+
     nnet_: nnet.NNet = nnet.NNet()
     recorder: record.Record = record.Record()
     start_recording: bool = True

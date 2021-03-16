@@ -13,7 +13,7 @@ RECORD_WAV_PATH: str = DATA_ROOT_PATH + '/record.wav'
 # wave config
 WAVE_RATE: int = 16000
 WAVE_CHANNELS: int = 1
-WAVE_CHUNK: int = 2048
+WAVE_CHUNK: int = 1024
 MFCC_DIM: int = 12
 MFCC_FRAMES: int = 64
 MFCC_SHIFT_INTERVAL: int = 2
