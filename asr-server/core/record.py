@@ -18,6 +18,7 @@ class Record:
         )
 
         self.wave: list = []
+        self.defect_wave: list = []
 
         self.is_recording: bool = False
         self.is_exit: bool = False
@@ -34,12 +35,21 @@ class Record:
 
             # stop recording
             else:
-                pass
+                # complement defect wave
+                self.defect_record()
 
         # close pyaudio
         self.stream.stop_stream()
         self.stream.close()
         self.pa.terminate()
+
+    def defect_record(self) -> None:
+        n_defect_sample: int = int(
+            config.WAVE_RATE / config.WAVE_CHUNK * config.WAVE_DEFECT_SEC)
+
+        if len(self.defect_wave) >= n_defect_sample:
+            self.defect_wave.pop(0)
+        self.defect_wave.append(self.input_audio())
 
     def input_audio(self) -> bytes:
         return self.stream.read(config.WAVE_CHUNK, exception_on_overflow=False)
@@ -49,10 +59,12 @@ class Record:
         wf.setnchannels(config.WAVE_CHANNELS)
         wf.setsampwidth(self.pa.get_sample_size(pyaudio.paInt16))
         wf.setframerate(config.WAVE_RATE)
+        wf.writeframes(b''.join(self.defect_wave))
         wf.writeframes(b''.join(self.wave))
         wf.close()
 
         self.wave = []
+        self.defect_wave = []
 
     def start(self) -> None:
         self.is_recording = True
