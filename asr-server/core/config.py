@@ -9,6 +9,7 @@ NOISE_ROOT_PATH: str = RECORD_ROOT_PATH + '/noise'
 MODEL_ROOT_PATH: str = './ckpt'
 MODEL_PATH: str = MODEL_ROOT_PATH + '/final.h5'
 RECORD_WAV_PATH: str = DATA_ROOT_PATH + '/record.wav'
+UPLOAD_WAV_PATH: str = DATA_ROOT_PATH + '/upload.wav'
 
 # wave config
 WAVE_RATE: int = 16000
@@ -31,3 +32,8 @@ METRICS: list = ['accuracy']
 # classes
 CLASSES: tuple = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
 N_CLASSES: int = len(CLASSES)
+
+# api
+API_SUCCESS_STATUS = 'OK'
+API_ERROR_STATUS = 'NG'
+API_RESPONSE: dict = {'status': API_SUCCESS_STATUS, 'message': ''}

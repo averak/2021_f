@@ -15,6 +15,7 @@ from core import nnet
 from core import preprocessing
 from core import record
 from core import util
+from webapi import create_app
 
 
 def train_mode():
@@ -110,8 +111,8 @@ def build_mode():
 
 
 def start_mode():
-    # FIXME
-    return
+    api = create_app()
+    api.run()
 
 
 def demo_mode():
