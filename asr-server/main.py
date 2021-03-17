@@ -9,11 +9,13 @@ import rwave
 import numpy as np
 
 from core import config
+from core import demo
 from core import message
 from core import nnet
 from core import preprocessing
 from core import record
 from core import util
+from webapi import create_app
 
 
 def train_mode():
@@ -83,7 +85,8 @@ def build_mode():
 
         # shift noise data
         for i in range(mfcc.shape[1] // config.MFCC_FRAMES):
-            shift_mfcc = mfcc[:, i * config.MFCC_FRAMES:(i + 1) * config.MFCC_FRAMES]
+            shift_mfcc = \
+                mfcc[:, i * config.MFCC_FRAMES:(i + 1) * config.MFCC_FRAMES]
             noise_mfccs.append(shift_mfcc)
 
     # speech data
@@ -108,38 +111,13 @@ def build_mode():
 
 
 def start_mode():
-    # FIXME
-    return
+    api = create_app()
+    api.run(debug=True, host='0.0.0.0', port=config.API_PORT)
 
 
 def demo_mode():
-    nnet_: nnet.NNet = nnet.NNet()
-    recorder: record.Record = record.Record()
-    start_recording: bool = True
-
-    print(message.RECORDING_HELP_MSG)
-    while input() != 'q':
-        if start_recording:
-            recorder.start()
-            print(message.RECORDING_VOICE_MSG(0), end='')
-        else:
-            recorder.stop()
-
-            recorder.save(config.RECORD_WAV_PATH)
-            print(message.CREATED_FILE_MSG(config.RECORD_WAV_PATH))
-
-            # predict
-            mfcc = rwave.to_mfcc(config.RECORD_WAV_PATH,
-                                 config.WAVE_RATE, config.MFCC_DIM)
-            mfcc = preprocessing.resample(
-                mfcc, config.MFCC_FRAMES)
-            mfcc = np.reshape(mfcc, (*mfcc.shape, 1))
-            pred_class = nnet_.predict(mfcc)
-            print(message.PREDICT_CLASS_MSG(config.CLASSES[pred_class]))
-
-        start_recording = not start_recording
-
-    recorder.exit()
+    demo_: demo.Demo = demo.Demo()
+    demo_.exec()
 
 
 def clear_mode():

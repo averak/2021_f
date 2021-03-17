@@ -10,11 +10,14 @@ tensorflow = "*"
 wave = "*"
 rwave = "*"
 tqdm = "*"
+flask = "*"
 
 [dev-packages]
 flake8 = "*"
 autopep8 = "*"
 pyaudio = "*"
+anal = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
