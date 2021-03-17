@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
+import copy
 import numpy as np
 import rwave
 
@@ -19,7 +20,7 @@ def allowed_file(filename):
 
 @bp.route('/', methods=['GET', 'POST'])
 def predict():
-    result: dict = config.API_RESPONSE
+    result: dict = copy.copy(config.API_RESPONSE)
     status: int = 200
 
     wav_file_key: str = 'wavfile'
