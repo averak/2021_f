@@ -112,41 +112,12 @@ def build_mode():
 
 def start_mode():
     api = create_app()
-    api.run()
+    api.run(debug=True, host='0.0.0.0', port=config.API_PORT)
 
 
 def demo_mode():
     demo_: demo.Demo = demo.Demo()
     demo_.exec()
-    sys.exit(0)
-
-    nnet_: nnet.NNet = nnet.NNet()
-    recorder: record.Record = record.Record()
-    start_recording: bool = True
-
-    print(message.RECORDING_HELP_MSG)
-    while input() != 'q':
-        if start_recording:
-            recorder.start()
-            print(message.RECORDING_VOICE_MSG(0), end='')
-        else:
-            recorder.stop()
-
-            recorder.save(config.RECORD_WAV_PATH)
-            print(message.CREATED_FILE_MSG(config.RECORD_WAV_PATH))
-
-            # predict
-            mfcc = rwave.to_mfcc(config.RECORD_WAV_PATH,
-                                 config.WAVE_RATE, config.MFCC_DIM)
-            mfcc = preprocessing.resample(
-                mfcc, config.MFCC_FRAMES)
-            mfcc = np.reshape(mfcc, (*mfcc.shape, 1))
-            pred_class = nnet_.predict(mfcc)
-            print(message.PREDICT_CLASS_MSG(config.CLASSES[pred_class]))
-
-        start_recording = not start_recording
-
-    recorder.exit()
 
 
 def clear_mode():

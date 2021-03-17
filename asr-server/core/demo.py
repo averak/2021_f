@@ -1,6 +1,7 @@
 import os
 import time
 import threading
+import requests
 import pyaudio
 import numpy as np
 import anal
@@ -43,8 +44,10 @@ class Demo:
         self.past_time: time.time
 
         self.is_recording: bool = False
-        self.is_save: bool = False
+        self.enable_detect: bool = True
         self.is_exit: bool = False
+
+        self.pred_class: str = ''
 
     def exec(self):
         # update border in sub-thread
@@ -68,9 +71,12 @@ class Demo:
                 else:
                     self.recorder.stop()
 
-                if self.is_save:
+                if not self.enable_detect:
                     self.recorder.save(config.RECORD_WAV_PATH)
-                    self.is_save = False
+
+                    self.pred_class = self.predict()
+                    self.enable_detect = True
+                    self.reset_audio_state()
 
             except KeyboardInterrupt:
                 os.system('clear')
@@ -96,15 +102,17 @@ class Demo:
             self.audio_state.total_vol / self.audio_state.n_sample
 
         # start/stop recording
-        if self.is_recording:
-            if self.judge_down_edge():
-                self.is_recording = False
-                self.is_save = True
-                self.reset_audio_state()
-        else:
-            if self.judge_up_edge():
-                self.is_recording = True
-                self.audio_state.border = self.audio_state.average_vol
+        if self.enable_detect:
+            if self.is_recording:
+                if self.judge_down_edge():
+                    self.audio_state.n_down_edge = 0
+                    self.is_recording = False
+                    self.enable_detect = False
+            else:
+                if self.judge_up_edge():
+                    self.audio_state.n_up_edge = 0
+                    self.is_recording = True
+                    self.audio_state.border = self.audio_state.average_vol
 
     def judge_up_edge(self) -> bool:
         judge_border: int = int(config.WAVE_RATE / config.WAVE_CHUNK / 10)
@@ -125,8 +133,7 @@ class Demo:
     def reset_audio_state(self, n_sample: int = 15) -> None:
         self.audio_state.total_vol = self.audio_state.average_vol * n_sample
         self.audio_state.n_sample = n_sample
-        if self.audio_state.average_vol >= self.audio_state.current_vol:
-            self.audio_state.n_up_edge = 0
+        self.audio_state.n_up_edge = 0
         self.past_time = time.time()
 
     def draw_field(self) -> None:
@@ -138,6 +145,7 @@ class Demo:
             self.generate_meter(self.audio_state.average_vol, True),
             self.generate_meter(self.audio_state.current_vol, True),
             self.generate_meter(self.audio_state.border),
+            self.pred_class,
         )
 
     def update_border(self) -> None:
@@ -157,6 +165,12 @@ class Demo:
             result = '\033[94m' + result
 
         return result
+
+    def predict(self) -> str:
+        url: str = 'http://0.0.0.0:%d/predict/' % config.API_PORT
+        files: dict = {'wavfile': open(config.RECORD_WAV_PATH, 'rb')}
+        res = requests.post(url, files=files)
+        return res.json()['class']
 
 
 if __name__ == '__main__':
