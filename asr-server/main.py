@@ -9,16 +9,13 @@ import rwave
 import numpy as np
 
 from core import config
-from core import demo
 from core import message
-from core import nnet
-from core import preprocessing
-from core import record
 from core import util
-from webapi import create_app
 
 
 def train_mode():
+    from core import nnet
+
     x: np.ndarray = np.load(config.TEACHER_X_PATH)
     y: np.ndarray = np.load(config.TEACHER_Y_PATH)
     x = np.reshape(x, (*x.shape, 1))
@@ -30,6 +27,8 @@ def train_mode():
 
 
 def record_mode():
+    from core import record
+
     default_source: str = '1'
     input_str: str = input(message.SOURCE_INPUT_GUIDE(default_source)) \
         or default_source
@@ -72,6 +71,8 @@ def record_mode():
 
 
 def build_mode():
+    from core import preprocessing
+
     # teacher data(x: mfcc, y: label)
     x: list = []
     y: list = []
@@ -111,11 +112,15 @@ def build_mode():
 
 
 def start_mode():
+    from webapi import create_app
+
     api = create_app()
     api.run(debug=True, host='0.0.0.0', port=config.API_PORT)
 
 
 def demo_mode():
+    from core import demo
+
     demo_: demo.Demo = demo.Demo()
     demo_.exec()
 
