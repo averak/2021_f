@@ -6,6 +6,7 @@ import numpy as np
 import anal
 
 from core import config
+from core import preprocessing
 from core import record
 
 
@@ -86,9 +87,8 @@ class Demo:
         amp_spec = np.fft.fft(wav)
         # power spectrum
         power_spec = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in amp_spec]
-
         # band-pass filter
-        # FIXME
+        power_spec = preprocessing.filter(power_spec)
 
         self.audio_state.current_vol = sum(power_spec)
         self.audio_state.total_vol += self.audio_state.current_vol

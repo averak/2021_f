@@ -64,10 +64,11 @@ def filter(data: np.ndarray) -> np.ndarray:
     low_edge = 100
     high_edge = 8000
 
-    delte = (config.WAVE_RATE / 2) / config.DATA_SAMPLES
-    bpf: np.ndarray = np.zeros(config.DATA_SAMPLES)
+    n_sample: int = len(data)
+    delte = (config.WAVE_RATE / 2) / n_sample
+    bpf: np.ndarray = np.zeros(n_sample)
 
-    for i in range(config.DATA_SAMPLES):
+    for i in range(n_sample):
         freq: float = i * delte
         if freq > low_edge and freq < high_edge:
             bpf[i] = 1
