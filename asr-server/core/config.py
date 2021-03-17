@@ -36,5 +36,6 @@ N_CLASSES: int = len(CLASSES)
 # api
 API_SUCCESS_STATUS = 'OK'
 API_ERROR_STATUS = 'NG'
-API_RESPONSE: dict = {'status': API_SUCCESS_STATUS, 'message': 'success'}
+API_SUCCESS_MSG = 'success'
+API_RESPONSE: dict = {'status': API_SUCCESS_STATUS, 'message': API_SUCCESS_MSG}
 API_PORT: int = 3033
