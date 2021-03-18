@@ -82,7 +82,7 @@ def build_mode():
     noise_files: list = glob.glob(config.NOISE_ROOT_PATH + '/*.wav')
     noise_mfccs: list = []
     for file in tqdm.tqdm(noise_files):
-        mfcc = preprocessing.extract_feature(file)
+        mfcc = preprocessing.extract_feature(file, False)
 
         # shift noise data
         for i in range(mfcc.shape[1] // config.MFCC_SAMPLES):

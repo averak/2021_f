@@ -1,20 +1,32 @@
 import numpy as np
-from scipy import signal
+import librosa
 import sklearn
-import rwave
 import pyroomacoustics as pra
+import scipy.io.wavfile as wf
+from scipy import signal
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
 
 from core import config
 
 
 # convert wave to MFCC
-def extract_feature(file_name: str) -> np.ndarray:
-    result: np.array = rwave.to_mfcc(
-        file_name,
-        config.WAVE_RATE,
-        config.MFCC_DIM,
+def extract_feature(file_name: str, cleaning: bool = True) -> np.ndarray:
+    # read wav file
+    wav: np.ndarray = wf.read(file_name)[1]
+    wav = wav.astype(np.float32)
+    # cleaning wave
+    if cleaning:
+        wav = noise_reduction(wav)
+        wav = voice_activity(wav)
+    # convert to MFCC
+    result: np.ndarray = librosa.feature.mfcc(
+        wav,
+        sr=config.WAVE_RATE,
+        n_mfcc=config.MFCC_DIM
     )
     result = np.reshape(result, (*result.shape, 1))
+
     return result
 
 
@@ -62,5 +74,36 @@ def resample(feature: np.ndarray) -> np.ndarray:
 def noise_reduction(feature: np.ndarray) -> np.ndarray:
     result: np.ndarray = pra.denoise.spectral_subtraction.apply_spectral_sub(
         feature, config.FFT_LENGTH)
-    result = result.astype(np.int16)
+    return result
+
+
+# extract only voice activity
+def voice_activity(feature: str) -> np.ndarray:
+    sound: AudioSegment = AudioSegment(
+        data=bytes(feature.astype(np.int16)),
+        sample_width=2,
+        frame_rate=config.WAVE_RATE,
+        channels=config.WAVE_CHANNELS
+    )
+
+    # extract only voice activity
+    chunks: list = split_on_silence(
+        sound,
+        min_silence_len=100,
+        silence_thresh=-40,
+        keep_silence=100,
+    )
+
+    # select the highest volume
+    result: np.ndarray
+    max_volume: int = 0
+    for chunk in chunks:
+        chunk_wav: list = chunk.get_array_of_samples()
+        chunk_volume: int = sum(np.abs(chunk_wav))
+
+        if chunk_volume > max_volume:
+            result = np.array(chunk_wav)
+            max_volume = chunk_volume
+
+    result = result.astype(np.float32)
     return result
