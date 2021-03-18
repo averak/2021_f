@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import copy
 
 from core import config
+from core import message
 from core import nnet
 from core import preprocessing
 
@@ -26,6 +27,7 @@ def predict():
     if wav_file_key in request.files:
         file = request.files[wav_file_key]
         file.save(config.UPLOAD_WAV_PATH)
+        print(message.CREATED_FILE_MSG(config.UPLOAD_WAV_PATH))
 
     # not received wav file
     else:
@@ -38,7 +40,8 @@ def predict():
     mfcc = preprocessing.extract_feature(config.UPLOAD_WAV_PATH)
     mfcc = preprocessing.resample(mfcc)
     mfcc = preprocessing.normalize(mfcc)
-    pred_class = nnet_.predict(mfcc)
-    result['class'] = config.CLASSES[pred_class]
+    pred_class_str: str = config.CLASSES[nnet_.predict(mfcc)]
+    print(message.PREDICT_CLASS_MSG(pred_class_str))
+    result['class'] = pred_class_str
 
     return jsonify(result), status

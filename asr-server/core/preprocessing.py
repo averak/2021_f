@@ -81,7 +81,7 @@ def noise_reduction(feature: np.ndarray) -> np.ndarray:
 def voice_activity(feature: str) -> np.ndarray:
     sound: AudioSegment = AudioSegment(
         data=bytes(feature.astype(np.int16)),
-        sample_width=2,
+        sample_width=config.WAVE_BIT // 8,
         frame_rate=config.WAVE_RATE,
         channels=config.WAVE_CHANNELS
     )
@@ -89,13 +89,13 @@ def voice_activity(feature: str) -> np.ndarray:
     # extract only voice activity
     chunks: list = split_on_silence(
         sound,
-        min_silence_len=100,
-        silence_thresh=-40,
-        keep_silence=100,
+        min_silence_len=config.MIN_SILENCE_LENGTH,
+        silence_thresh=config.SILENCE_THRESH,
+        keep_silence=config.KEEP_SILENCE,
     )
 
     # select the highest volume
-    result: np.ndarray
+    result: np.ndarray = feature
     max_volume: int = 0
     for chunk in chunks:
         chunk_wav: list = chunk.get_array_of_samples()

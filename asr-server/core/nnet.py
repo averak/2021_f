@@ -17,12 +17,12 @@ class NNet:
         result.add(layers.Conv2D(32, (3, 3), activation='relu'))
         result.add(layers.MaxPool2D((2, 2)))
         result.add(layers.Dropout(config.DROPOUT_RATE))
-        result.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        result.add(layers.Conv2D(32, (3, 3), activation='relu'))
         result.add(layers.MaxPool2D((2, 2)))
         result.add(layers.Dropout(config.DROPOUT_RATE))
 
         result.add(layers.Flatten())
-        result.add(layers.Dense(64, activation='relu'))
+        result.add(layers.Dense(32, activation='relu'))
         result.add(layers.Dropout(config.DROPOUT_RATE))
         result.add(layers.Dense(config.N_CLASSES, activation='softmax'))
 
