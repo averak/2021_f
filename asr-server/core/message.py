@@ -8,6 +8,8 @@ class FontColors:
 ERROR_INVALID_SOURCE_NAME: str = FontColors.RED + \
     'Cannot record such source name. Try again.' + FontColors.RESET
 
+ERROR_ASR_SERVER_NOT_STARTED: str = FontColors.RED + \
+    'ASR-server is not started.' + FontColors.RESET
 
 RECORDING_HELP_MSG: str = 'Press enter to start recording.' + \
     '\n' + \

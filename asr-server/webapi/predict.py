@@ -1,7 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
 import copy
-import numpy as np
-import rwave
 
 from core import config
 from core import nnet
@@ -9,7 +7,7 @@ from core import preprocessing
 
 bp: Blueprint = Blueprint('infer', __name__)
 
-nnet_: nnet.NNet = nnet.NNet()
+nnet_: nnet.NNet = nnet.NNet(True)
 
 
 def allowed_file(filename):
@@ -37,10 +35,9 @@ def predict():
         return jsonify(result), status
 
     # predict
-    mfcc = rwave.to_mfcc(config.UPLOAD_WAV_PATH,
-                         config.WAVE_RATE, config.MFCC_DIM)
-    mfcc = preprocessing.resample(mfcc, config.MFCC_FRAMES)
-    mfcc = np.reshape(mfcc, (*mfcc.shape, 1))
+    mfcc = preprocessing.extract_feature(config.UPLOAD_WAV_PATH)
+    mfcc = preprocessing.resample(mfcc)
+    mfcc = preprocessing.normalize(mfcc)
     pred_class = nnet_.predict(mfcc)
     result['class'] = config.CLASSES[pred_class]
 

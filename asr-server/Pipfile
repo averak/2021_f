@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 numpy = "*"
 scipy = "*"
+sklearn = "*"
 tensorflow = "*"
 wave = "*"
-rwave = "*"
+librosa = "*"
+pyroomacoustics = "*"
 tqdm = "*"
 flask = "*"
 

@@ -16,15 +16,17 @@ WAVE_RATE: int = 16000
 WAVE_CHANNELS: int = 1
 WAVE_CHUNK: int = 1024
 WAVE_DEFECT_SEC: float = 0.4
+WAVE_AMP_SAMPLES: int = 6
 MFCC_DIM: int = 12
-MFCC_FRAMES: int = 64
-MFCC_SHIFT_INTERVAL: int = 2
-INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_FRAMES, 1)
+MFCC_SAMPLES: int = 64
+FFT_LENGTH = 512
+INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_SAMPLES, 1)
 
 # training params
-EPOCHS: int = 50
+EPOCHS: int = 20
 BATCH_SIZE: int = 32
 VALIDATION_SPLIT: float = 0.1
+DROPOUT_RATE: float = 0.5
 OPTIMIZER: str = 'adam'
 LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']

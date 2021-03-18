@@ -7,6 +7,7 @@ import numpy as np
 import anal
 
 from core import config
+from core import message
 from core import preprocessing
 from core import record
 
@@ -94,7 +95,7 @@ class Demo:
         # power spectrum
         power_spec = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in amp_spec]
         # band-pass filter
-        power_spec = preprocessing.filter(power_spec)
+        power_spec = preprocessing.filtering(power_spec)
 
         self.audio_state.current_vol = sum(power_spec)
         self.audio_state.total_vol += self.audio_state.current_vol
@@ -130,9 +131,10 @@ class Demo:
 
         return self.audio_state.n_down_edge > judge_border
 
-    def reset_audio_state(self, n_sample: int = 15) -> None:
-        self.audio_state.total_vol = self.audio_state.average_vol * n_sample
-        self.audio_state.n_sample = n_sample
+    def reset_audio_state(self) -> None:
+        self.audio_state.total_vol = \
+            self.audio_state.average_vol * config.WAVE_AMP_SAMPLES
+        self.audio_state.n_sample = config.WAVE_AMP_SAMPLES
         self.audio_state.n_up_edge = 0
         self.past_time = time.time()
 
@@ -142,6 +144,7 @@ class Demo:
             str(int(self.audio_state.current_vol)),
             str(int(self.audio_state.border)),
             '\033[%dm録音中' % (32 if self.is_recording else 90),
+            '\033[%dm認識中' % (32 if not self.enable_detect else 90),
             self.generate_meter(self.audio_state.average_vol, True),
             self.generate_meter(self.audio_state.current_vol, True),
             self.generate_meter(self.audio_state.border),
@@ -167,10 +170,16 @@ class Demo:
         return result
 
     def predict(self) -> str:
-        url: str = 'http://0.0.0.0:%d/predict/' % config.API_PORT
-        files: dict = {'wavfile': open(config.RECORD_WAV_PATH, 'rb')}
-        res = requests.post(url, files=files)
-        return res.json()['class']
+        result: str
+        try:
+            url: str = 'http://0.0.0.0:%d/predict/' % config.API_PORT
+            files: dict = {'wavfile': open(config.RECORD_WAV_PATH, 'rb')}
+            res = requests.post(url, files=files)
+            result = res.json()['class']
+        except Exception:
+            result = message.ERROR_ASR_SERVER_NOT_STARTED
+
+        return result
 
 
 if __name__ == '__main__':
