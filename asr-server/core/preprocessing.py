@@ -2,6 +2,7 @@ import numpy as np
 from scipy import signal
 import sklearn
 import rwave
+import pyroomacoustics as pra
 
 from core import config
 
@@ -54,4 +55,12 @@ def resample(feature: np.ndarray) -> np.ndarray:
         axis=1,
     )
     result = result.T
+    return result
+
+
+# spectral subtraction
+def noise_reduction(feature: np.ndarray) -> np.ndarray:
+    result: np.ndarray = pra.denoise.spectral_subtraction.apply_spectral_sub(
+        feature, config.FFT_LENGTH)
+    result = result.astype(np.int16)
     return result

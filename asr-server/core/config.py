@@ -19,6 +19,7 @@ WAVE_DEFECT_SEC: float = 0.4
 WAVE_AMP_SAMPLES: int = 6
 MFCC_DIM: int = 12
 MFCC_SAMPLES: int = 64
+FFT_LENGTH = 512
 INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_SAMPLES, 1)
 
 # training params
