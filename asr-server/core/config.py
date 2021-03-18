@@ -13,13 +13,17 @@ UPLOAD_WAV_PATH: str = DATA_ROOT_PATH + '/upload.wav'
 
 # wave config
 WAVE_RATE: int = 16000
+WAVE_BIT: int = 16
 WAVE_CHANNELS: int = 1
 WAVE_CHUNK: int = 1024
 WAVE_DEFECT_SEC: float = 0.4
 WAVE_AMP_SAMPLES: int = 6
 MFCC_DIM: int = 12
 MFCC_SAMPLES: int = 64
-FFT_LENGTH = 512
+FFT_LENGTH: int = 512
+MIN_SILENCE_LENGTH: int = 100
+SILENCE_THRESH: int = -20
+KEEP_SILENCE: int = 100
 INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_SAMPLES, 1)
 
 # training params
