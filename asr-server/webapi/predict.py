@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
 import copy
-import numpy as np
 
 from core import config
 from core import nnet
@@ -36,7 +35,7 @@ def predict():
         return jsonify(result), status
 
     # predict
-    mfcc = preprocessing.to_mfcc(config.UPLOAD_WAV_PATH)
+    mfcc = preprocessing.extract_feature(config.UPLOAD_WAV_PATH)
     mfcc = preprocessing.resample(mfcc)
     mfcc = preprocessing.normalize(mfcc)
     pred_class = nnet_.predict(mfcc)

@@ -82,12 +82,12 @@ def build_mode():
     noise_files: list = glob.glob(config.NOISE_ROOT_PATH + '/*.wav')
     noise_mfccs: list = []
     for file in tqdm.tqdm(noise_files):
-        mfcc = preprocessing.to_mfcc(file)
+        mfcc = preprocessing.extract_feature(file)
 
         # shift noise data
-        for i in range(mfcc.shape[1] // config.MFCC_FRAMES):
+        for i in range(mfcc.shape[1] // config.MFCC_SAMPLES):
             shift_mfcc = \
-                mfcc[:, i * config.MFCC_FRAMES:(i + 1) * config.MFCC_FRAMES]
+                mfcc[:, i * config.MFCC_SAMPLES:(i + 1) * config.MFCC_SAMPLES]
             noise_mfccs.append(shift_mfcc)
 
     # speech data
@@ -96,7 +96,7 @@ def build_mode():
         files: list = glob.glob('%s/%s/*.wav' %
                                 (config.SPEECH_ROOT_PATH, class_name))
         for file in files:
-            speech_mfcc = preprocessing.to_mfcc(file)
+            speech_mfcc = preprocessing.extract_feature(file)
             speech_mfcc = preprocessing.resample(speech_mfcc)
 
             # add noises

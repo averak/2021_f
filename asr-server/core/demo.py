@@ -95,7 +95,7 @@ class Demo:
         # power spectrum
         power_spec = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in amp_spec]
         # band-pass filter
-        power_spec = preprocessing.filter(power_spec)
+        power_spec = preprocessing.filtering(power_spec)
 
         self.audio_state.current_vol = sum(power_spec)
         self.audio_state.total_vol += self.audio_state.current_vol
@@ -131,9 +131,10 @@ class Demo:
 
         return self.audio_state.n_down_edge > judge_border
 
-    def reset_audio_state(self, n_sample: int = 6) -> None:
-        self.audio_state.total_vol = self.audio_state.average_vol * n_sample
-        self.audio_state.n_sample = n_sample
+    def reset_audio_state(self) -> None:
+        self.audio_state.total_vol = \
+            self.audio_state.average_vol * config.WAVE_AMP_SAMPLES
+        self.audio_state.n_sample = config.WAVE_AMP_SAMPLES
         self.audio_state.n_up_edge = 0
         self.past_time = time.time()
 

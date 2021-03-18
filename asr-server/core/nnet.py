@@ -15,8 +15,10 @@ class NNet:
         result: Sequential = Sequential()
         result.add(layers.Input(shape=config.INPUT_SHAPE))
         result.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        result.add(layers.MaxPool2D((2, 2)))
         result.add(layers.Dropout(config.DROPOUT_RATE))
         result.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        result.add(layers.MaxPool2D((2, 2)))
         result.add(layers.Dropout(config.DROPOUT_RATE))
 
         result.add(layers.Flatten())
@@ -58,8 +60,8 @@ class NNet:
         # save final weights
         self.nnet.save_weights(config.MODEL_PATH)
 
-    def predict(self, vector: np.ndarray) -> int:
-        result: int = np.argmax(self.nnet.predict(np.array([vector]))[0])
+    def predict(self, feature: np.ndarray) -> int:
+        result: int = np.argmax(self.nnet.predict(np.array([feature]))[0])
         return result
 
     def evaluate(self, x: np.ndarray, y: np.ndarray) -> float:

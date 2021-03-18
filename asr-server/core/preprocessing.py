@@ -7,7 +7,7 @@ from core import config
 
 
 # convert wave to MFCC
-def to_mfcc(file_name: str) -> np.ndarray:
+def extract_feature(file_name: str) -> np.ndarray:
     result: np.array = rwave.to_mfcc(
         file_name,
         config.WAVE_RATE,
@@ -18,9 +18,9 @@ def to_mfcc(file_name: str) -> np.ndarray:
 
 
 # normalize to 0~1
-def normalize(data: np.ndarray) -> np.ndarray:
-    result: np.ndarray = data.flatten()
-    result_shape: tuple = data.shape
+def normalize(feature: np.ndarray) -> np.ndarray:
+    result: np.ndarray = feature.flatten()
+    result_shape: tuple = feature.shape
 
     result = sklearn.preprocessing.minmax_scale(result)
     result = np.reshape(result, result_shape)
@@ -29,12 +29,12 @@ def normalize(data: np.ndarray) -> np.ndarray:
 
 
 # band-pass filter
-def filter(data: np.ndarray) -> np.ndarray:
+def filtering(feature: np.ndarray) -> np.ndarray:
     # edge freq [Hz]
     low_edge = 100
     high_edge = 8000
 
-    n_sample: int = len(data)
+    n_sample: int = len(feature)
     delte = (config.WAVE_RATE / 2) / n_sample
     bpf: np.ndarray = np.zeros(n_sample)
 
@@ -43,14 +43,14 @@ def filter(data: np.ndarray) -> np.ndarray:
         if freq > low_edge and freq < high_edge:
             bpf[i] = 1
 
-    return data * bpf
+    return feature * bpf
 
 
-# resample mfcc
-def resample(mfcc: np.ndarray) -> np.ndarray:
+# resample feature
+def resample(feature: np.ndarray) -> np.ndarray:
     result: np.ndarray = signal.resample(
-        mfcc.T,
-        config.MFCC_FRAMES,
+        feature.T,
+        config.MFCC_SAMPLES,
         axis=1,
     )
     result = result.T
