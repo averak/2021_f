@@ -43,17 +43,13 @@ def normalize(feature: np.ndarray) -> np.ndarray:
 
 # band-pass filter
 def filtering(feature: np.ndarray) -> np.ndarray:
-    # edge freq [Hz]
-    low_edge = 100
-    high_edge = 8000
-
     n_sample: int = len(feature)
     delte = (config.WAVE_RATE / 2) / n_sample
     bpf: np.ndarray = np.zeros(n_sample)
 
     for i in range(n_sample):
         freq: float = i * delte
-        if freq > low_edge and freq < high_edge:
+        if freq > config.BPF_LOW_FREQ and freq < config.BPF_HIGH_FREQ:
             bpf[i] = 1
 
     return feature * bpf

@@ -1,4 +1,4 @@
-# data path
+# path config
 DATA_ROOT_PATH: str = './data'
 TEACHER_ROOT_PATH: str = DATA_ROOT_PATH + '/teacher'
 TEACHER_X_PATH: str = TEACHER_ROOT_PATH + '/x.npy'
@@ -18,15 +18,21 @@ WAVE_CHANNELS: int = 1
 WAVE_CHUNK: int = 1024
 WAVE_DEFECT_SEC: float = 0.4
 WAVE_AMP_SAMPLES: int = 6
-MFCC_DIM: int = 12
-MFCC_SAMPLES: int = 64
+
+# wave preprocessing config
+BPF_LOW_FREQ: int = 100
+BPF_HIGH_FREQ: int = 8000
 FFT_LENGTH: int = 512
 MIN_SILENCE_LENGTH: int = 100
 SILENCE_THRESH: int = -20
 KEEP_SILENCE: int = 100
+
+# mfcc config
+MFCC_DIM: int = 12
+MFCC_SAMPLES: int = 64
 INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_SAMPLES, 1)
 
-# training params
+# training config
 EPOCHS: int = 20
 BATCH_SIZE: int = 32
 VALIDATION_SPLIT: float = 0.1
@@ -35,13 +41,13 @@ OPTIMIZER: str = 'adam'
 LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']
 
-# classes
+# class config
 CLASSES: tuple = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
 N_CLASSES: int = len(CLASSES)
 
-# api
-API_SUCCESS_STATUS = 'OK'
-API_ERROR_STATUS = 'NG'
-API_SUCCESS_MSG = 'success'
+# api config
+API_SUCCESS_STATUS: str = 'OK'
+API_ERROR_STATUS: str = 'NG'
+API_SUCCESS_MSG: str = 'success'
 API_RESPONSE: dict = {'status': API_SUCCESS_STATUS, 'message': API_SUCCESS_MSG}
 API_PORT: int = 3033
