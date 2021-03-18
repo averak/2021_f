@@ -26,14 +26,6 @@ def DELETE_FILE_MSG(file_name: str) -> str:
     return result
 
 
-def VOCODE_COMPLETE_MSG(file_name: str) -> str:
-    result: str = 'Vocodede ' + \
-        FontColors.YELLOW + \
-        file_name + \
-        FontColors.RESET
-    return result
-
-
 def CREATED_DATA_MSG(n_data: int) -> str:
     result: str = 'Created %d data' % n_data
     return result
