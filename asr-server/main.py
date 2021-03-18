@@ -5,7 +5,6 @@ import glob
 import tqdm
 import shutil
 import argparse
-import rwave
 import numpy as np
 
 from core import config
@@ -15,15 +14,16 @@ from core import util
 
 def train_mode():
     from core import nnet
+    from sklearn.model_selection import train_test_split
 
     x: np.ndarray = np.load(config.TEACHER_X_PATH)
     y: np.ndarray = np.load(config.TEACHER_Y_PATH)
-    x = np.reshape(x, (*x.shape, 1))
+
+    # split data for training & validation
+    x_train, x_val, y_train, y_val = train_test_split(x, y, train_size=0.8)
 
     nnet_: nnet.NNet = nnet.NNet(False)
-    nnet_.train(x, y)
-
-    print(message.ACCURACY_MSG(nnet_.evaluate(x, y)))
+    nnet_.train(x_train, y_train)
 
 
 def record_mode():
@@ -82,7 +82,7 @@ def build_mode():
     noise_files: list = glob.glob(config.NOISE_ROOT_PATH + '/*.wav')
     noise_mfccs: list = []
     for file in tqdm.tqdm(noise_files):
-        mfcc = rwave.to_mfcc(file, config.WAVE_RATE, config.MFCC_DIM)
+        mfcc = preprocessing.to_mfcc(file)
 
         # shift noise data
         for i in range(mfcc.shape[1] // config.MFCC_FRAMES):
@@ -96,15 +96,17 @@ def build_mode():
         files: list = glob.glob('%s/%s/*.wav' %
                                 (config.SPEECH_ROOT_PATH, class_name))
         for file in files:
-            speech_mfcc = rwave.to_mfcc(
-                file, config.WAVE_RATE, config.MFCC_DIM)
-            speech_mfcc = preprocessing.resample(
-                speech_mfcc, config.MFCC_FRAMES)
+            speech_mfcc = preprocessing.to_mfcc(file)
+            speech_mfcc = preprocessing.resample(speech_mfcc)
 
             # add noises
             for noise_mfcc in noise_mfccs:
-                x.append(speech_mfcc + noise_mfcc)
-                y.append(config.CLASSES.index(class_name))
+                for sn_rate in range(5):
+                    sn_rate *= 0.2
+                    mixed_mfcc = speech_mfcc + noise_mfcc * sn_rate
+                    mixed_mfcc = preprocessing.normalize(mixed_mfcc)
+                    x.append(mixed_mfcc)
+                    y.append(config.CLASSES.index(class_name))
 
     # save teacher data
     np.save(config.TEACHER_X_PATH, np.array(x))

@@ -1,59 +1,29 @@
 import numpy as np
-import scipy.io.wavfile as wf
 from scipy import signal
+import sklearn
+import rwave
 
 from core import config
 
 
-# output spectrogram
-def exec(file_name: str) -> np.ndarray:
-    wav: np.ndarray = wf.read(file_name)[1]
-    spec: np.ndarray = stft(wav, True)
-
-    result: np.ndarray = np.empty((0, config.DATA_SAMPLES))
-
-    for frame in spec:
-        # preprocessing
-        frame = normalize(frame)
-        frame = filter(frame)
-
-        result = np.vstack([result, frame])
-
-    return result
-
-
-# convert wave -> spectrogram
-def stft(wav: np.ndarray, to_log: bool) -> np.ndarray:
-    result: np.ndarray = signal.stft(wav, fs=config.WAVE_RATE)[2]
-
-    # convert to log scale
-    if to_log:
-        result = np.where(result == 0, 0.1 ** 10, result)
-        result = 10 * np.log10(np.abs(result))
-
-    # time <-> freq
-    result = result.T
-
-    return result
-
-
-# convert spectrogram -> wave
-def istft(spec: np.ndarray) -> np.ndarray:
-    result: np.ndarray = signal.istft(spec.T, fs=config.WAVE_RATE)[1]
+# convert wave to MFCC
+def to_mfcc(file_name: str) -> np.ndarray:
+    result: np.array = rwave.to_mfcc(
+        file_name,
+        config.WAVE_RATE,
+        config.MFCC_DIM,
+    )
+    result = np.reshape(result, (*result.shape, 1))
     return result
 
 
 # normalize to 0~1
 def normalize(data: np.ndarray) -> np.ndarray:
-    n_min: int = data.min(keepdims=True)
-    n_max: int = data.max(keepdims=True)
+    result: np.ndarray = data.flatten()
+    result_shape: tuple = data.shape
 
-    result: np.ndarray = None
-
-    if (n_max - n_min) == 0:
-        result = data
-    else:
-        result = (data - n_min) / (n_max - n_min)
+    result = sklearn.preprocessing.minmax_scale(result)
+    result = np.reshape(result, result_shape)
 
     return result
 
@@ -77,7 +47,11 @@ def filter(data: np.ndarray) -> np.ndarray:
 
 
 # resample mfcc
-def resample(mfcc: np.ndarray, n_frames: int) -> np.ndarray:
-    result: np.ndarray = signal.resample(mfcc.T, n_frames)
+def resample(mfcc: np.ndarray) -> np.ndarray:
+    result: np.ndarray = signal.resample(
+        mfcc.T,
+        config.MFCC_FRAMES,
+        axis=1,
+    )
     result = result.T
     return result

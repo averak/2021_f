@@ -22,9 +22,10 @@ MFCC_SHIFT_INTERVAL: int = 2
 INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_FRAMES, 1)
 
 # training params
-EPOCHS: int = 50
+EPOCHS: int = 20
 BATCH_SIZE: int = 32
 VALIDATION_SPLIT: float = 0.1
+DROPOUT_RATE: float = 0.5
 OPTIMIZER: str = 'adam'
 LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']

@@ -4,6 +4,7 @@ from tensorflow.keras import Sequential
 import numpy as np
 
 from core import config
+from core import message
 
 
 class NNet:
@@ -14,13 +15,13 @@ class NNet:
         result: Sequential = Sequential()
         result.add(layers.Input(shape=config.INPUT_SHAPE))
         result.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
+        result.add(layers.Dropout(config.DROPOUT_RATE))
         result.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        result.add(layers.Dropout(0.3))
+        result.add(layers.Dropout(config.DROPOUT_RATE))
 
         result.add(layers.Flatten())
         result.add(layers.Dense(64, activation='relu'))
-        result.add(layers.Dropout(0.3))
+        result.add(layers.Dropout(config.DROPOUT_RATE))
         result.add(layers.Dense(config.N_CLASSES, activation='softmax'))
 
         # result.summary()
@@ -51,6 +52,8 @@ class NNet:
 
             # save checkpoint
             self.nnet.save_weights('%s/%d.h5' % (config.MODEL_ROOT_PATH, step))
+            # display accuracy
+            print(message.ACCURACY_MSG(self.evaluate(x, y)))
 
         # save final weights
         self.nnet.save_weights(config.MODEL_PATH)
