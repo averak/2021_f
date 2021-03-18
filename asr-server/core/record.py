@@ -57,7 +57,7 @@ class Record:
     def save(self, file_name: str) -> None:
         wf = wave.open(file_name, 'wb')
         wf.setnchannels(config.WAVE_CHANNELS)
-        wf.setsampwidth(self.pa.get_sample_size(pyaudio.paInt16))
+        wf.setsampwidth(config.WAVE_WIDTH)
         wf.setframerate(config.WAVE_RATE)
         wf.writeframes(b''.join(self.defect_wave))
         wf.writeframes(b''.join(self.wave))

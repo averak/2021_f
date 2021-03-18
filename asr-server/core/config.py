@@ -13,7 +13,7 @@ UPLOAD_WAV_PATH: str = DATA_ROOT_PATH + '/upload.wav'
 
 # wave config
 WAVE_RATE: int = 16000
-WAVE_BIT: int = 16
+WAVE_WIDTH: int = 2
 WAVE_CHANNELS: int = 1
 WAVE_CHUNK: int = 1024
 WAVE_DEFECT_SEC: float = 0.4

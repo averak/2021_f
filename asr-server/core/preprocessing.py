@@ -77,7 +77,7 @@ def noise_reduction(feature: np.ndarray) -> np.ndarray:
 def voice_activity(feature: str) -> np.ndarray:
     sound: AudioSegment = AudioSegment(
         data=bytes(feature.astype(np.int16)),
-        sample_width=config.WAVE_BIT // 8,
+        sample_width=config.WAVE_WIDTH,
         frame_rate=config.WAVE_RATE,
         channels=config.WAVE_CHANNELS
     )
