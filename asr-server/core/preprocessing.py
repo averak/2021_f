@@ -95,7 +95,7 @@ def voice_activity(feature: str) -> np.ndarray:
     )
 
     # select the highest volume
-    result: np.ndarray
+    result: np.ndarray = feature
     max_volume: int = 0
     for chunk in chunks:
         chunk_wav: list = chunk.get_array_of_samples()
