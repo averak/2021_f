@@ -51,20 +51,27 @@ def record_mode():
     start_recording: bool = True
 
     print(message.RECORDING_HELP_MSG)
-    while input() != 'q':
-        if start_recording:
-            recorder.start()
-            print(message.RECORDING_VOICE_MSG(save_index), end='')
-        else:
-            recorder.stop()
+    while True:
+        try:
+            if input() == 'q':
+                break
 
-            # <save_root_path>/<save_index>.wav
-            file_name: str = '%s/%d.wav' % (save_root_path, save_index)
-            recorder.save(file_name)
-            print(message.CREATED_FILE_MSG(file_name))
-            save_index += 1
+            if start_recording:
+                recorder.start()
+                print(message.RECORDING_VOICE_MSG(save_index), end='')
+            else:
+                recorder.stop()
 
-        start_recording = not start_recording
+                # <save_root_path>/<save_index>.wav
+                file_name: str = '%s/%d.wav' % (save_root_path, save_index)
+                recorder.save(file_name)
+                print(message.CREATED_FILE_MSG(file_name))
+                save_index += 1
+
+            start_recording = not start_recording
+
+        except KeyboardInterrupt:
+            break
 
     print(message.CREATED_DATA_MSG(save_index))
     recorder.exit()
