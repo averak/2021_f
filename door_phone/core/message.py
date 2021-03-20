@@ -16,6 +16,27 @@ RECORDING_HELP_MSG: str = 'Press enter to start recording.' + \
     'Enter the <q> key to quit.'
 
 
+def WS_ON_MESSAGE(message: str) -> str:
+    result: str = 'Wessocket receive ' + \
+        FontColors.GREEN + message + FontColors.RESET
+    return result
+
+
+def WS_ON_ERROR(message: str) -> str:
+    result: str = 'Wessocket error ' + \
+        FontColors.RED + message + FontColors.RESET
+    return result
+
+
+WS_ON_CLOSE: str = 'Wessocket close'
+
+
+def WS_ON_OPEN(params: str) -> str:
+    result: str = 'Wessocket open ' + \
+        FontColors.RED + params + FontColors.RESET
+    return result
+
+
 def CREATED_FILE_MSG(file_name: str) -> str:
     result: str = 'Created ' + FontColors.YELLOW + file_name + FontColors.RESET
     return result

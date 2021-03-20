@@ -9,6 +9,7 @@ pyaudio = "*"
 numpy = "*"
 requests = "*"
 anal = "*"
+websocket-client = "*"
 
 [dev-packages]
 flake8 = "*"
