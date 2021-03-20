@@ -6,6 +6,7 @@ import pyaudio
 import requests
 
 from core import config
+from core import message
 
 
 class SpeechSynth:
@@ -29,6 +30,7 @@ class SpeechSynth:
             output=True,
         )
         # play!
+        print(message.PLAY_AUDIO_MSG(text))
         voice = wav.readframes(config.WAVE_CHUNK)
         while len(voice) > 0:
             streamer.write(voice)
@@ -63,6 +65,7 @@ class SpeechSynth:
         wav = res.content
         with open(self.file_name(text), 'wb') as f:
             f.write(wav)
+        print(message.CREATED_FILE_MSG(self.file_name(text)))
 
     def file_name(self, text: str) -> str:
         text = re.sub(r"[。．、，,.]", "", text)
