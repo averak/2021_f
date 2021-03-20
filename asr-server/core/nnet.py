@@ -14,17 +14,31 @@ class NNet:
     def make_nnet(self, load_weights: bool) -> Sequential:
         result: Sequential = Sequential()
         result.add(layers.Input(shape=config.INPUT_SHAPE))
-        result.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
-        result.add(layers.Dropout(config.DROPOUT_RATE))
-        result.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        result.add(layers.MaxPool2D((2, 2)))
+
+        # convolution 1st layer
+        result.add(layers.Conv2D(32, (3, 3), padding='same'))
+        result.add(layers.BatchNormalization())
+        result.add(layers.Activation('relu'))
+        result.add(layers.MaxPool2D())
         result.add(layers.Dropout(config.DROPOUT_RATE))
 
-        result.add(layers.Flatten())
-        result.add(layers.Dense(32, activation='relu'))
+        # convolution 2st layer
+        result.add(layers.Conv2D(32, (3, 3), padding='same'))
+        result.add(layers.BatchNormalization())
+        result.add(layers.Activation('relu'))
+        result.add(layers.MaxPool2D())
         result.add(layers.Dropout(config.DROPOUT_RATE))
-        result.add(layers.Dense(config.N_CLASSES, activation='softmax'))
+
+        # fully connected 1st layer
+        result.add(layers.Flatten())
+        result.add(layers.Dense(32, use_bias=False))
+        result.add(layers.BatchNormalization())
+        result.add(layers.Activation('relu'))
+        result.add(layers.Dropout(config.DROPOUT_RATE))
+
+        # fully connected final layer
+        result.add(layers.Dense(config.N_CLASSES))
+        result.add(layers.Activation('softmax'))
 
         # result.summary()
 
@@ -54,8 +68,6 @@ class NNet:
 
             # save checkpoint
             self.nnet.save_weights('%s/%d.h5' % (config.MODEL_ROOT_PATH, step))
-            # display accuracy
-            print(message.ACCURACY_MSG(self.evaluate(x, y)))
 
         # save final weights
         self.nnet.save_weights(config.MODEL_PATH)

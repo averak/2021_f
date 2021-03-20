@@ -1,6 +1,6 @@
 import numpy as np
 import librosa
-import sklearn
+import sklearn.preprocessing
 import pyroomacoustics as pra
 import scipy.io.wavfile as wf
 from scipy import signal

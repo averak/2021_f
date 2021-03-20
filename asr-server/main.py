@@ -24,6 +24,7 @@ def train_mode():
 
     nnet_: nnet.NNet = nnet.NNet(False)
     nnet_.train(x_train, y_train)
+    print(message.ACCURACY_MSG(nnet_.evaluate(x_val, y_val)))
 
 
 def record_mode():
