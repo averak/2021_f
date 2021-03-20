@@ -4,6 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+wave = "*"
+pyaudio = "*"
+numpy = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
