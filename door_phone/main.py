@@ -15,6 +15,7 @@ def demo_mode():
     demo_ = demo.Demo()
     demo_.exec()
 
+
 if __name__ == '__main__':
     # options
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
