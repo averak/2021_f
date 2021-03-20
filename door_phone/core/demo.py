@@ -5,11 +5,18 @@ import requests
 import pyaudio
 import numpy as np
 import anal
+import json
+import websocket
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 
 from core import config
 from core import message
 from core import preprocessing
 from core import record
+from core import speech_synth
 
 
 class AudioStateInfo:
@@ -42,20 +49,53 @@ class Demo:
         # detection params
         self.audio_state: AudioStateInfo = AudioStateInfo()
         self.reset_state_interval: float = 0.3
-        self.past_time: time.time
+        self.past_time: time.time = time.time()
 
         self.is_recording: bool = False
-        self.enable_detect: bool = True
+        self.enable_detect: bool = False
         self.is_exit: bool = False
 
         self.pred_class: str = ''
+        self.log_message: str = ''
 
-    def exec(self):
+        # create web socket object
+        self.ws_app = websocket.WebSocketApp(
+            config.INTERMEDIATE_SERVER_URL,
+            on_message=self.on_message,
+            on_error=self.on_error,
+            on_close=self.on_close,
+        )
+        self.ws_app.on_open = self.on_open
+        self.ws_app.run_forever()
+
+    def start(self):
         # update border in sub-thread
-        self.thread: threading.Thread = \
+        thread: threading.Thread = \
             threading.Thread(target=self.update_border)
-        self.thread.start()
+        thread.start()
 
+        self.synthesiser = speech_synth.SpeechSynth()
+        # respond rules
+        rules: dict = {
+            "1": "友人、知人",
+            "2": "宅配業者",
+            "3": "NHK",
+            "4": "宗教勧誘",
+        }
+        for cmd in rules:
+            text: str = "%sのかたは%sを" % (rules[cmd], cmd)
+            self.log_message = message.PLAY_AUDIO_MSG(text)
+            self.draw_field()
+            self.synthesiser.play(text)
+        self.synthesiser.play("ピー")
+
+        # start to detect
+        self.audio_state.border = 9999
+        self.detect_loop()
+
+    def detect_loop(self):
+        self.enable_detect: bool = True
+        self.reset_audio_state()
         self.past_time = time.time()
 
         while not self.is_exit:
@@ -76,6 +116,8 @@ class Demo:
                     self.recorder.save(config.RECORD_WAV_PATH)
 
                     self.pred_class = self.predict()
+                    self.send_params(self.pred_class)
+                    self.synthesiser.play("%s番が選択されました" % self.pred_class)
                     self.enable_detect = True
                     self.reset_audio_state()
 
@@ -149,6 +191,7 @@ class Demo:
             self.generate_meter(self.audio_state.current_vol, True),
             self.generate_meter(self.audio_state.border),
             self.pred_class,
+            self.log_message,
         )
 
     def update_border(self) -> None:
@@ -172,16 +215,65 @@ class Demo:
     def predict(self) -> str:
         result: str
         try:
-            url: str = config.ASR_NUMBER_URL
             files: dict = {'wavfile': open(config.RECORD_WAV_PATH, 'rb')}
-            res = requests.post(url, files=files)
+            res = requests.post(config.ASR_NUMBER_URL, files=files)
             result = res.json()['text']
         except Exception:
             result = message.ERROR_ASR_SERVER_NOT_STARTED
 
         return result
 
+    def on_message(self, ws_app, received_message):
+        speech_texts: dict = {
+            "訪問者確認": "どうぞ、お入りください",
+            "置き配": "置き配をお願いいたします",
+            "置き配確認": "置き配が可能か確認中です。しばらくお待ちください。",
+            "在宅確認": "在宅確認中です。しばらくお待ちください。",
+            "撃退": "今お母さんいないよ",
+            "4": "宗教勧誘",
+        }
 
-if __name__ == '__main__':
-    demo = Demo()
-    demo.exec()
+        # play終了まで待機
+        while True:
+            if self.enable_detect:
+                break
+            time.sleep(0.2)
+        self.enable_detect = False
+
+        res: dict = json.loads(received_message)
+        try:
+            text = speech_texts[res['message']]
+            self.log_message = message.PLAY_AUDIO_MSG(text)
+            self.draw_field()
+            self.synthesiser.play(speech_texts[res['message']])
+        except Exception:
+            pass
+
+        self.log_message = message.WS_ON_MESSAGE(received_message)
+        self.draw_field()
+        self.reset_audio_state()
+
+    def on_error(self, ws_app, error):
+        self.log_message = message.WS_ON_ERROR(error)
+        self.draw_field()
+
+    def on_close(self, ws_app):
+        self.is_exit = True
+        self.log_message = message.WS_ON_CLOSE
+        self.draw_field()
+
+    def on_open(self, ws_app):
+        self.log_message = message.WS_ON_OPEN
+        self.draw_field()
+        thread.start_new_thread(self.start, ())
+
+    def send_params(self, class_str: str) -> None:
+        params: dict = {
+            "method": 'PROXY',
+            "from": 'DOOR',
+            "select": class_str,
+        }
+        params_str: str = json.dumps(params)
+        self.log_message = message.WS_SEND_MSG(params_str)
+        self.ws_app.send(params_str)
+        self.draw_field()
