@@ -33,7 +33,7 @@ MFCC_SAMPLES: int = 64
 INPUT_SHAPE: tuple = (MFCC_DIM, MFCC_SAMPLES, 1)
 
 # training config
-EPOCHS: int = 20
+EPOCHS: int = 3
 BATCH_SIZE: int = 32
 VALIDATION_SPLIT: float = 0.1
 DROPOUT_RATE: float = 0.5
