@@ -11,3 +11,9 @@
 ```sh
 $ pipenv install
 ```
+
+### 実行方法
+
+```sh
+$ pipenv run start
+```
