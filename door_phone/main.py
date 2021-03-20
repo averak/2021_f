@@ -3,6 +3,7 @@ import json
 import websocket
 import argparse
 
+from core import config
 from core import message
 
 
@@ -28,7 +29,7 @@ def on_open(ws, params):
 
 
 def start_mode():
-    from core import speech_synth
+    # from core import speech_synth
 
     ws_app = websocket.WebSocketApp(
         config.INTERMEDIATE_SERVER_URL,
