@@ -50,9 +50,11 @@ class Demo:
         self.audio_state: AudioStateInfo = AudioStateInfo()
         self.reset_state_interval: float = 0.3
         self.past_time: time.time = time.time()
+        self.record_start_time: time.time
 
         self.is_recording: bool = False
         self.enable_detect: bool = False
+        self.block_detect: bool = True
         self.is_exit: bool = False
 
         self.pred_class: str = ''
@@ -87,15 +89,15 @@ class Demo:
             self.log_message = message.PLAY_AUDIO_MSG(text)
             self.draw_field()
             self.synthesiser.play(text)
-        self.synthesiser.play("ピー")
+        self.synthesiser.play("選択してください")
 
         # start to detect
-        self.audio_state.border = 9999
         self.detect_loop()
 
     def detect_loop(self):
         self.enable_detect: bool = True
-        self.reset_audio_state()
+        self.block_detect = False
+        self.audio_state.border += 2000
         self.past_time = time.time()
 
         while not self.is_exit:
@@ -103,8 +105,9 @@ class Demo:
                 if time.time() - self.past_time > self.reset_state_interval:
                     self.reset_audio_state()
 
-                self.audio_state.n_sample += 1
-                self.detection()
+                if not self.block_detect:
+                    self.audio_state.n_sample += 1
+                    self.detection()
                 self.draw_field()
 
                 if self.is_recording:
@@ -147,7 +150,8 @@ class Demo:
         # start/stop recording
         if self.enable_detect:
             if self.is_recording:
-                if self.judge_down_edge():
+                if self.judge_down_edge() or \
+                        time.time() - self.record_start_time > 3:
                     self.audio_state.n_down_edge = 0
                     self.is_recording = False
                     self.enable_detect = False
@@ -156,6 +160,7 @@ class Demo:
                     self.audio_state.n_up_edge = 0
                     self.is_recording = True
                     self.audio_state.border = self.audio_state.average_vol
+                    self.record_start_time = time.time()
 
     def judge_up_edge(self) -> bool:
         judge_border: int = int(config.WAVE_RATE / config.WAVE_CHUNK / 10)
@@ -224,13 +229,17 @@ class Demo:
         return result
 
     def on_message(self, ws_app, received_message):
+        self.log_message = message.WS_ON_MESSAGE(received_message)
+        self.draw_field()
+
         speech_texts: dict = {
             "訪問者確認": "どうぞ、お入りください",
             "置き配": "置き配をお願いいたします",
             "置き配確認": "置き配が可能か確認中です。しばらくお待ちください。",
             "在宅確認": "在宅確認中です。しばらくお待ちください。",
             "撃退": "今お母さんいないよ",
-            "4": "宗教勧誘",
+            "OK": "在宅が確認できました。どうぞ、お入りください",
+            "NG": "不在のため、今回はお引き取りください",
         }
 
         # play終了まで待機
@@ -238,20 +247,20 @@ class Demo:
             if self.enable_detect:
                 break
             time.sleep(0.2)
-        self.enable_detect = False
 
         res: dict = json.loads(received_message)
         try:
+            self.block_detect = True
             text = speech_texts[res['message']]
             self.log_message = message.PLAY_AUDIO_MSG(text)
             self.draw_field()
-            self.synthesiser.play(speech_texts[res['message']])
-        except Exception:
-            pass
+            self.synthesiser.play(text)
+        except Exception as e:
+            self.log_message = message.WS_ON_ERROR(received_message)
+            self.draw_field()
 
-        self.log_message = message.WS_ON_MESSAGE(received_message)
-        self.draw_field()
         self.reset_audio_state()
+        self.block_detect = False
 
     def on_error(self, ws_app, error):
         self.log_message = message.WS_ON_ERROR(error)
