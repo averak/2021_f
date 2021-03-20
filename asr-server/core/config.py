@@ -42,7 +42,8 @@ LOSS: str = 'sparse_categorical_crossentropy'
 METRICS: list = ['accuracy']
 
 # class config
-CLASSES: tuple = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
+# CLASSES: tuple = ('1', '2', '3', '4', '5', '6', '7', '8', '9')
+CLASSES: tuple = ('1', '2', '3', '4')
 N_CLASSES: int = len(CLASSES)
 
 # api config
