@@ -51,3 +51,5 @@ API_ERROR_STATUS: str = 'NG'
 API_SUCCESS_MSG: str = 'success'
 API_RESPONSE: dict = {'status': API_SUCCESS_STATUS, 'message': API_SUCCESS_MSG}
 API_PORT: int = 3033
+DOCOMO_URL: str = \
+    'https://api.apigw.smt.docomo.ne.jp/amiVoice/v1/recognize?APIKEY='

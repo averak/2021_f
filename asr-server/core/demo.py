@@ -172,10 +172,10 @@ class Demo:
     def predict(self) -> str:
         result: str
         try:
-            url: str = 'http://0.0.0.0:%d/predict/' % config.API_PORT
+            url: str = 'http://0.0.0.0:%d/predict/number' % config.API_PORT
             files: dict = {'wavfile': open(config.RECORD_WAV_PATH, 'rb')}
             res = requests.post(url, files=files)
-            result = res.json()['class']
+            result = res.json()['text']
         except Exception:
             result = message.ERROR_ASR_SERVER_NOT_STARTED
 

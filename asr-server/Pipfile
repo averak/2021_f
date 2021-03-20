@@ -13,6 +13,7 @@ librosa = "*"
 pyroomacoustics = "*"
 tqdm = "*"
 flask = "*"
+pydub = "*"
 
 [dev-packages]
 flake8 = "*"
