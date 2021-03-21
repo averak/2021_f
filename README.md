@@ -28,7 +28,7 @@ Nuxt.js と Electron を用いたネイティブアプリケーションです�
 
 ![](media/demo.gif)
 
-- [ソースコード](https://github.com/Chige12/kc3hack-front)
+- [ソースコード](https://github.com/kc3hack/2021_f/tree/main/front-app)
 
 ### 中間サーバ
 
@@ -36,7 +36,7 @@ PC 常駐アプリとドアホン専用機の仲介を担います。
 
 それぞれと Websocket で通信をし，設定の更新や応対音声の再生命令などを担当します。
 
-- [ソースコード](https://github.com/inatatsu-tatsuhiro/kc3_server)
+- [ソースコード](https://github.com/kc3hack/2021_f/tree/main/intermediate-server)
 
 ### 音声認識サーバ
 
