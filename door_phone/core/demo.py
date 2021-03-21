@@ -52,6 +52,7 @@ class Demo:
         self.past_time: time.time = time.time()
         self.record_start_time: time.time
 
+        self.is_confirm: bool = False
         self.is_recording: bool = False
         self.enable_detect: bool = False
         self.block_detect: bool = True
@@ -83,6 +84,7 @@ class Demo:
             "2": "宅配業者",
             "3": "NHK",
             "4": "宗教勧誘",
+            "5": "ウーバーイーツ",
         }
         for cmd in rules:
             text: str = "%sのかたは%sを" % (rules[cmd], cmd)
@@ -119,7 +121,8 @@ class Demo:
                     self.recorder.save(config.RECORD_WAV_PATH)
 
                     self.pred_class = self.predict()
-                    self.ws_app.send('{"method": "PROXY","from": "DOOR","select": "3"}')
+                    if not self.is_confirm:
+                        self.ws_app.send('{"method": "PROXY","from": "DOOR","select": "0"}')
                     self.send_params(self.pred_class)
                     self.synthesiser.play("%s番が選択されました" % self.pred_class)
                     self.enable_detect = True
@@ -238,9 +241,10 @@ class Demo:
 
         speech_texts: dict = {
             "置き配": "置き配をお願いいたします",
-            "置き配確認": "置き配が可能か確認中です。しばらくお待ちください。",
+            "置き配確認": "置き配が可能か確認してください。",
             "在宅確認": "在宅確認中です。しばらくお待ちください。",
             "撃退": "今お母さんいないよ",
+            "サイレン": "ただいま呼び出し中です。しばらくお待ちください。",
             "OK": "在宅が確認できました。どうぞ、お入りください",
             "NG": "不在のため、今回はお引き取りください",
         }
@@ -257,10 +261,19 @@ class Demo:
         res: dict = json.loads(received_message)
         try:
             self.block_detect = True
+            self.is_confirm = False
             text = speech_texts[res['message']]
+
+            if res['message'] == "置き配確認":
+                self.is_confirm = True
+                self.synthesiser.play("置き配が可能な場合は1を")
+                self.synthesiser.play("置き配が不可能な場合は2を")
+                text = "選択してください"
+
             self.log_message = message.PLAY_AUDIO_MSG(text)
             self.draw_field()
             self.synthesiser.play(text)
+
         except Exception as e:
             self.log_message = message.WS_ON_ERROR(received_message)
             self.draw_field()
@@ -283,6 +296,12 @@ class Demo:
         thread.start_new_thread(self.start, ())
 
     def send_params(self, class_str: str) -> None:
+        if self.is_confirm and class_str != '1' and class_str != '2':
+            text = "1か2を選択してください"
+            self.synthesiser.play(text)
+            self.log_message = text
+            return
+
         params: dict = {
             "method": 'PROXY',
             "from": 'DOOR',
