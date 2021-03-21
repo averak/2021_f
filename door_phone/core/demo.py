@@ -78,7 +78,7 @@ class Demo:
         thread.start()
 
         self.synthesiser = speech_synth.SpeechSynth()
-        # respond rules
+        # """
         rules: dict = {
             "1": "友人、知人",
             "2": "宅配業者",
@@ -92,6 +92,7 @@ class Demo:
             self.draw_field()
             self.synthesiser.play(text)
         self.synthesiser.play("選択してください")
+        # """
 
         # start to detect
         self.detect_loop()
@@ -122,7 +123,8 @@ class Demo:
 
                     self.pred_class = self.predict()
                     if not self.is_confirm:
-                        self.ws_app.send('{"method": "PROXY","from": "DOOR","select": "0"}')
+                        self.ws_app.send(
+                            '{"method": "PROXY","from": "DOOR","select": "0"}')
                     self.send_params(self.pred_class)
                     self.synthesiser.play("%s番が選択されました" % self.pred_class)
                     self.enable_detect = True

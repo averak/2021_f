@@ -6,7 +6,8 @@
 
 [![KC3Hack](https://kc3.me/hack/wp-content/uploads/2021/01/kc3hack2021ogp@2x.png)](https://kc3.me/hack)
 
-## プロダクト名
+## 応対撃退サイレン君
+
 
 ## プロダクト説明
 
@@ -54,6 +55,8 @@
 Nuxt.js と Electron を用いたネイティブアプリケーションです。
 
 友人知人の時はドアを解錠，宅配の時は置き配をお願いする，などの設定をすることができる他，条件によってサイレンを鳴らすことも可能です。
+
+![](media/demo.gif)
 
 - [ソースコード](https://github.com/Chige12/kc3hack-front)
 
