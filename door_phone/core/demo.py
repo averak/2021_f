@@ -119,6 +119,7 @@ class Demo:
                     self.recorder.save(config.RECORD_WAV_PATH)
 
                     self.pred_class = self.predict()
+                    self.ws_app.send('{"method": "PROXY","from": "DOOR","select": "3"}')
                     self.send_params(self.pred_class)
                     self.synthesiser.play("%s番が選択されました" % self.pred_class)
                     self.enable_detect = True
@@ -232,8 +233,10 @@ class Demo:
         self.log_message = message.WS_ON_MESSAGE(received_message)
         self.draw_field()
 
+        if '訪問者確認' in received_message:
+            return
+
         speech_texts: dict = {
-            "訪問者確認": "どうぞ、お入りください",
             "置き配": "置き配をお願いいたします",
             "置き配確認": "置き配が可能か確認中です。しばらくお待ちください。",
             "在宅確認": "在宅確認中です。しばらくお待ちください。",
